@@ -22,7 +22,7 @@ Project Rule: **End every task with a commit**.
 
 ## 5. Documentation
 
-- [ ] 5.1 Create `README.md` containing: project purpose, tech stack, architecture diagram, repo structure, quickstart guide (`uv sync`, `uv run pytest`), and OpenSpec workflow reference · Verify: manual review confirms all sections exist · Commit
+- [x] 5.1 Create `README.md` containing: project purpose, tech stack, architecture diagram, repo structure, quickstart guide (`uv sync`, `uv run pytest`), and OpenSpec workflow reference · Verify: manual review confirms all sections exist · Commit
 
 ## 6. Integration Verification
 
