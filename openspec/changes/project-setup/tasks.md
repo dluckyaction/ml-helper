@@ -18,7 +18,7 @@ Project Rule: **End every task with a commit**.
 ## 4. Baseline Tests
 
 - [x] 4.1 Add a smoke test in `tests/` that imports `core`, `infrastructure`, and `entrypoints` · Verify: `uv run pytest` executes green · Commit
-- [ ] 4.2 Add core purity guard in `tests/`: using `ast` (stdlib), parse all files in `src/core` and fail on any import of `streamlit`, `gradio`, or `fastapi` · Verify: `uv run pytest` passes green; confirm guard catches injected forbidden imports · Commit
+- [x] 4.2 Add core purity guard in `tests/`: using `ast` (stdlib), parse all files in `src/core` and fail on any import of `streamlit`, `gradio`, or `fastapi` · Verify: `uv run pytest` passes green; confirm guard catches injected forbidden imports · Commit
 
 ## 5. Documentation
 
