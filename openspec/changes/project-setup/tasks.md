@@ -5,7 +5,7 @@ Project Rule: **End every task with a commit**.
 
 ## 1. OpenSpec Configuration
 
-- [ ] 1.1 Rewrite `openspec/config.yaml` as valid YAML: `context` with tech stack (Python 3.13+, uv, Pandas, Polars, PyArrow, Pydantic, Pytest), domain, hexagonal architecture with strict pure core rule in `src/core`, and artifact language rule (English); `rules` requiring task commits; `operations.apply` instructing to run `uv run pytest` before marking tasks complete · Verify: `openspec doctor` parses without errors · Commit
+- [x] 1.1 Rewrite `openspec/config.yaml` as valid YAML: `context` with tech stack (Python 3.13+, uv, Pandas, Polars, PyArrow, Pydantic, Pytest), domain, hexagonal architecture with strict pure core rule in `src/core`, and artifact language rule (English); `rules` requiring task commits; `operations.apply` instructing to run `uv run pytest` before marking tasks complete · Verify: `openspec doctor` parses without errors · Commit
 
 ## 2. Packaging with `uv`
 
