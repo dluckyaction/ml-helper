@@ -1,0 +1,40 @@
+schema: spec-driven
+
+# Project context
+# Shown to AI when creating artifacts.
+context:
+  project: ML Helper
+  description: >
+    Platform for machine learning experimentation and analysis built on a
+    hexagonal (clean) architecture with a strict pure core.
+  tech_stack:
+    - Python 3.13+
+    - uv
+    - Pandas
+    - Polars
+    - PyArrow
+    - Pydantic
+    - Pytest
+  domain: Machine learning workflows, data processing, and model experimentation
+  architecture:
+    - Hexagonal architecture under src/ with three layers: src/core (pure domain,
+      models and ports), src/infrastructure (adapters: I/O, connectors, persistence),
+      and src/entrypoints (UI/API/CLI).
+    - Strict pure core rule: src/core must not import streamlit, gradio, or fastapi.
+    - Container-ready deployment, executable via CLI or service.
+  conventions:
+    - All OpenSpec artifacts and repository documentation are written in English.
+
+# Per-artifact rules
+rules:
+  tasks:
+    - End every task with a commit
+
+# Per-operation guidance
+operations:
+  apply:
+    guidance:
+      - Run `uv run pytest` before marking tasks complete
+  archive:
+    guidance:
+      - Summarize the results before archiving
