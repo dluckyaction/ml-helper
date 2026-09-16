@@ -26,4 +26,4 @@ Project Rule: **End every task with a commit**.
 
 ## 6. Integration Verification
 
-- [ ] 6.1 Run final baseline verification: `openspec doctor` passes, `uv run pytest` runs green, and `uv sync` is reproducible · Verify: all commands exit OK · Commit
+- [x] 6.1 Run final baseline verification: `openspec doctor` passes, `uv run pytest` runs green, and `uv sync` is reproducible · Verify: all commands exit OK · Commit
