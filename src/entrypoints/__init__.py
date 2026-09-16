@@ -1,0 +1,1 @@
+"""Entrypoints layer: UI/API/CLI adapters."""

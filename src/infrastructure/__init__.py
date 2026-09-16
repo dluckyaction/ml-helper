@@ -1,0 +1,1 @@
+"""Infrastructure layer: adapters, I/O, connectors, and persistence."""

@@ -9,7 +9,7 @@ Project Rule: **End every task with a commit**.
 
 ## 2. Packaging with `uv`
 
-- [ ] 2.1 Initialize project with `uv init` setting `requires-python = ">=3.13"`, add runtime dependencies (`pandas`, `polars`, `pyarrow`, `pydantic`), dev optional dependencies (`pytest`), and `[tool.pytest.ini_options] testpaths = ["tests"]` in `pyproject.toml` · Verify: `uv sync` completes without errors · Commit
+- [x] 2.1 Initialize project with `uv init` setting `requires-python = ">=3.13"`, add runtime dependencies (`pandas`, `polars`, `pyarrow`, `pydantic`), dev optional dependencies (`pytest`), and `[tool.pytest.ini_options] testpaths = ["tests"]` in `pyproject.toml` · Verify: `uv sync` completes without errors · Commit
 
 ## 3. Hexagonal Structure
 
