@@ -13,7 +13,7 @@ Project Rule: **End every task with a commit**.
 
 ## 3. Hexagonal Structure
 
-- [ ] 3.1 Create `src/core/`, `src/infrastructure/`, `src/entrypoints/`, each with `__init__.py`, and the `tests/` directory · Verify: `uv run python -c "import core, infrastructure, entrypoints"` runs without errors · Commit
+- [x] 3.1 Create `src/core/`, `src/infrastructure/`, `src/entrypoints/`, each with `__init__.py`, and the `tests/` directory · Verify: `uv run python -c "import core, infrastructure, entrypoints"` runs without errors · Commit
 
 ## 4. Baseline Tests
 
