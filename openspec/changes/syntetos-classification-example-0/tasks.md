@@ -37,5 +37,5 @@ No calculations in this section: core holds vocabulary, thresholds, the engine p
 
 ## 6. Integration verification
 
-- [ ] 6.1 Run `uv run pytest` and verify the full suite passes, including the core purity guard; commit
+- [x] 6.1 Run `uv run pytest` and verify the full suite passes, including the core purity guard; commit
 - [ ] 6.2 Run `marimo run src/entrypoints/syntetos_classifier/notebook.py` with a sample series CSV and verify the chart and classification box render, including the Not Classifiable case for a zero-free series (manual); commit
