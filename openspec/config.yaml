@@ -18,6 +18,16 @@ context: >-
 
   Rules:
   - Strict pure core rule: src/core must not import streamlit, gradio, or fastapi.
+  - Calculations live in infrastructure, not core. Core owns vocabulary,
+    thresholds, ports (Protocol), and domain decisions only; every numeric
+    computation (counts, means, standard deviations) belongs to an
+    infrastructure adapter behind a core-defined port, so it can be vectorized
+    and replaced without touching core.
+  - Naming/semantics: ML Helper is a generic ML tool, so reader and notebook
+    vocabulary is domain-neutral ("series", "date column", "value column").
+    Domain-specific terms such as "demand" are confined to algorithm-inherent
+    code (the core decision module and the infrastructure metrics engine) and
+    must never appear in the reader, entrypoints, or user-visible wording.
   - All OpenSpec artifacts and repository documentation are written in English.
 
 # Per-artifact rules
