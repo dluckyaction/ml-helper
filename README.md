@@ -49,6 +49,40 @@ Pydantic, and PyArrow. It SHALL NOT import **Streamlit**, **Gradio**, or
 guard in `tests/test_core_purity.py`, which fails with the offending file
 name if the rule is broken.
 
+### Calculations Live in Infrastructure
+
+`src/core` holds vocabulary, thresholds, ports (`Protocol`), and domain
+decisions — and nothing else. Every numeric computation belongs to an
+infrastructure adapter behind a core-defined port.
+
+Python loops over per-period values are far too slow for real workloads, so
+the operations that must scale (counting nonzero periods, means, standard
+deviations) are implemented in `src/infrastructure` with vectorized
+expressions. Swapping or accelerating an engine never touches the domain
+decision.
+
+For example, `src/core/syntetos.py` defines `SeriesType`, the ADI/CV²
+thresholds, a `SeriesMetricsEngine` port, and `classify(adi, cv2)`. The
+engine itself is `PolarsSyntetosMetrics` in `src/infrastructure`, which
+satisfies the port and also classifies many series in one grouped pass.
+
+### Naming & Semantics
+
+ML Helper is a **generic** ML tool, so application vocabulary is
+domain-neutral. Readers, adapters, and notebooks speak of "series", "date
+column", and "value column" — never "demand", "SKU", or "forecast".
+
+Domain-specific terms are permitted only inside **algorithm-inherent code**,
+meaning the core module that encodes the algorithm's vocabulary and the
+infrastructure module that implements its math. In this repository that means
+the Syntetos-Boylan classification: `src/core/syntetos.py` and
+`src/infrastructure/syntetos_metrics.py` may say "demand" because the
+algorithm defines it, while `time_series_reader.py` and the notebook must
+not.
+
+Capabilities and files are named after algorithms or generic ML concepts,
+never after a product domain.
+
 ## Repository Structure
 
 ```
@@ -59,6 +93,7 @@ name if the rule is broken.
 │   ├── infrastructure/      # Adapters: I/O, connectors, persistence
 │   └── entrypoints/         # UI/API/CLI entrypoints
 ├── tests/                   # Pytest suite (smoke + purity guard)
+├── AGENTS.md                # Conventions for AI agents working in this repo
 ├── pyproject.toml           # Packaging, dependencies, pytest config
 └── README.md
 ```
