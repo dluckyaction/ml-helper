@@ -28,17 +28,34 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md("## Series classification")
-
     date_column = mo.ui.text(label="Date column", value="date")
     value_column = mo.ui.text(label="Value column", value="value")
     source = mo.ui.text(label="Path or URL")
-    upload = mo.ui.file_uploader(label="…or upload a CSV or Parquet file")
-    submit = mo.ui.submit_button(label="Classify")
+    upload = mo.ui.file(label="…or upload a CSV or Parquet file")
 
-    form = mo.ui.form(mo.vstack([date_column, value_column, source, upload, submit]))
+    form = mo.md(
+        """
+        ## Series classification
+
+        {date_column}
+
+        {value_column}
+
+        {source}
+
+        {upload}
+        """
+    ).batch(
+        date_column=date_column,
+        value_column=value_column,
+        source=source,
+        upload=upload,
+    ).form(
+        submit_button_label="Classify",
+        bordered=False,
+    )
     form
-    return date_column, form, source, submit, upload, value_column
+    return (form,)
 
 
 @app.cell
@@ -46,20 +63,19 @@ def _(
     PolarsSyntetosMetrics,
     TimeSeriesReadError,
     classify_series,
-    date_column,
     form,
     load_time_series,
-    source,
-    submit,
-    upload,
-    value_column,
+    mo,
 ):
+    import io
+
     form
 
     mo.stop(form.value is None, mo.md("Submit the form to classify a series."))
 
-    typed_source = source.value.strip()
-    uploaded = upload.value[0] if upload.value else None
+    typed_source = (form.value["source"] or "").strip()
+    uploads = form.value["upload"] or ()
+    uploaded = uploads[0] if uploads else None
 
     error = None
     if uploaded is not None and typed_source:
@@ -69,11 +85,17 @@ def _(
 
     result = None
     if error is None:
+        if uploaded is not None:
+            stream = io.BytesIO(uploaded.contents)
+            stream.name = uploaded.name
+            input_source = stream
+        else:
+            input_source = typed_source
         try:
             _loaded = load_time_series(
-                uploaded if uploaded is not None else typed_source,
-                date_column.value.strip(),
-                value_column.value.strip(),
+                input_source,
+                (form.value["date_column"] or "").strip(),
+                (form.value["value_column"] or "").strip(),
             )
             result = (_loaded, classify_series(_loaded.values, PolarsSyntetosMetrics()))
         except TimeSeriesReadError as exc:
@@ -83,21 +105,19 @@ def _(
         mo.ui.alert(error, kind="error")
         mo.stop(True)
 
-    mo.stop(result is None)
-
     return (result,)
 
 
 @app.cell
 def _(alt, mo, result):
-    loaded, series_type = result
+    _loaded, series_type = result
 
     mo.ui.altair_chart(
         alt.Chart(
             alt.Data(
                 values={
-                    "date": loaded.dates.dt.strftime("%Y-%m-%d").tolist(),
-                    "value": loaded.values.tolist(),
+                    "date": _loaded.dates.dt.strftime("%Y-%m-%d").tolist(),
+                    "value": _loaded.values.tolist(),
                 }
             )
         )
