@@ -102,7 +102,7 @@ def _(
             error = str(exc)
 
     if error is not None:
-        mo.ui.alert(error, kind="error")
+        mo.callout(error, kind="danger", title="Could not classify the series")
         mo.stop(True)
 
     return (result,)
