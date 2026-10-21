@@ -28,7 +28,7 @@
 - [x] 5.1 Rewrite `README.md` per design D6–D7 (portfolio purpose, stack, architecture summary linking to `openspec/specs/architecture/spec.md`, structure, technique catalog with the `syntetos` row, quickstart including how to open the notebook); verify the README contains each element; commit
 - [x] 5.2 Add the catalog guard to `tests/test_architecture.py`; verify it passes and fails when the `syntetos` row is temporarily removed (check manually, then revert); commit
 - [x] 5.3 Rewrite `AGENTS.md` as the operational checklist linking to the spec (design D7); verify it links to `openspec/specs/architecture/spec.md` and no longer contradicts it (no Pydantic or PyArrow allowed in core, no blanket "demand" ban); commit
-- [ ] 5.4 Rewrite `openspec/config.yaml` `context` and add the per-artifact `rules` from design D7; verify `openspec instructions proposal --change establish-portfolio-architecture --json` shows the new context and rules, and `openspec validate --all` passes; commit
+- [x] 5.4 Rewrite `openspec/config.yaml` `context` and add the per-artifact `rules` from design D7; verify `openspec instructions proposal --change establish-portfolio-architecture --json` shows the new context and rules, and `openspec validate --all` passes; commit
 
 ## 6. Verification
 
