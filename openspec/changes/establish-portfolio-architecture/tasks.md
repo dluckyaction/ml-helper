@@ -3,7 +3,7 @@
 ## 1. Package restructure
 
 - [x] 1.1 Move `src/core`, `src/infrastructure`, `src/entrypoints` under `src/ml_helper/` with `git mv`, add `src/ml_helper/__init__.py`, and set `packages = ["src/ml_helper"]` in `pyproject.toml`; verify `uv sync` succeeds and `uv run python -c "import ml_helper.core, ml_helper.infrastructure, ml_helper.entrypoints"` exits 0; commit
-- [ ] 1.2 Relocate Syntetos modules per design D2 (`infrastructure/shared/time_series_reader.py`, `infrastructure/syntetos/metrics.py`, `entrypoints/syntetos/notebook.py`), update every import in `src/` and `tests/` to `ml_helper.…`, and update the smoke test; verify `uv run pytest` passes; commit
+- [x] 1.2 Relocate Syntetos modules per design D2 (`infrastructure/shared/time_series_reader.py`, `infrastructure/syntetos/metrics.py`, `entrypoints/syntetos/notebook.py`), update every import in `src/` and `tests/` to `ml_helper.…`, and update the smoke test; verify `uv run pytest` passes; commit
 - [ ] 1.3 Remove `pydantic` from the runtime dependencies and refresh `uv.lock`; verify `uv sync` and `uv run pytest` pass; commit
 
 ## 2. Syntetos pipeline

@@ -14,9 +14,12 @@ def _():
 
 @app.cell
 def _():
-    from core.syntetos import classify_series
-    from infrastructure.syntetos_metrics import PolarsSyntetosMetrics
-    from infrastructure.time_series_reader import TimeSeriesReadError, load_time_series
+    from ml_helper.core.syntetos import classify_series
+    from ml_helper.infrastructure.syntetos.metrics import PolarsSyntetosMetrics
+    from ml_helper.infrastructure.shared.time_series_reader import (
+        TimeSeriesReadError,
+        load_time_series,
+    )
 
     return (
         PolarsSyntetosMetrics,

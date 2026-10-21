@@ -5,7 +5,7 @@ from pathlib import Path
 
 FORBIDDEN_IMPORTS = {"streamlit", "gradio", "fastapi"}
 
-CORE_DIR = Path(__file__).resolve().parents[1] / "src" / "core"
+CORE_DIR = Path(__file__).resolve().parents[1] / "src" / "ml_helper" / "core"
 
 
 def _imported_module_roots(tree):

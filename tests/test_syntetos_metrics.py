@@ -13,8 +13,8 @@ Expected ADI and CV^2 values are hand-computed:
 
 import polars as pl
 import pytest
-from core.syntetos import SeriesMetricsEngine, SeriesType, classify_series
-from infrastructure.syntetos_metrics import PolarsSyntetosMetrics
+from ml_helper.core.syntetos import SeriesMetricsEngine, SeriesType, classify_series
+from ml_helper.infrastructure.syntetos.metrics import PolarsSyntetosMetrics
 
 ENGINE = PolarsSyntetosMetrics()
 

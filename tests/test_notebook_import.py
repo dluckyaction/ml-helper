@@ -7,10 +7,13 @@ a stubbed form value so that every branch is actually exercised.
 
 import marimo as mo
 import pytest
-from core.syntetos import classify_series
-from entrypoints.syntetos_classifier import notebook
-from infrastructure.syntetos_metrics import PolarsSyntetosMetrics
-from infrastructure.time_series_reader import TimeSeriesReadError, load_time_series
+from ml_helper.core.syntetos import classify_series
+from ml_helper.entrypoints.syntetos import notebook
+from ml_helper.infrastructure.syntetos.metrics import PolarsSyntetosMetrics
+from ml_helper.infrastructure.shared.time_series_reader import (
+    TimeSeriesReadError,
+    load_time_series,
+)
 
 CELLS = list(notebook.app._cell_manager.cells())
 

@@ -8,7 +8,7 @@ import ast
 from pathlib import Path
 
 import pytest
-from core.syntetos import (
+from ml_helper.core.syntetos import (
     ADI_HIGH,
     CV2_HIGH,
     SeriesMetrics,
@@ -119,7 +119,7 @@ _METRIC_HELPERS = ("avg_demand_interval", "squared_cv", "mean", "stdev", "std")
 
 def test_core_module_performs_no_arithmetic():
     """Core owns the decision; every calculation belongs to an engine."""
-    path = Path(__file__).resolve().parents[1] / "src" / "core" / "syntetos.py"
+    path = Path(__file__).resolve().parents[1] / "src" / "ml_helper" / "core" / "syntetos.py"
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
 
     arithmetic = [

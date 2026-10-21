@@ -8,7 +8,7 @@ series can be classified in a single grouped pass.
 from typing import Sequence
 
 import polars as pl
-from core.syntetos import SeriesMetrics
+from ml_helper.core.syntetos import SeriesMetrics
 
 
 class PolarsSyntetosMetrics:

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pandas as pd
 import pytest
-from infrastructure.time_series_reader import (
+from ml_helper.infrastructure.shared.time_series_reader import (
     TimeSeriesReadError,
     load_time_series,
 )
@@ -94,7 +94,7 @@ def test_load_from_unsupported_upload_raises():
 
 
 def test_load_from_url(tmp_path, monkeypatch):
-    import infrastructure.time_series_reader as reader
+    import ml_helper.infrastructure.shared.time_series_reader as reader
 
     def fake_read_csv(source):
         assert source == "https://example.com/series.csv"
