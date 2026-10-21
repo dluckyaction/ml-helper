@@ -7,13 +7,9 @@ a stubbed form value so that every branch is actually exercised.
 
 import marimo as mo
 import pytest
-from ml_helper.core.syntetos import classify_series
 from ml_helper.entrypoints.syntetos import notebook
-from ml_helper.infrastructure.syntetos.metrics import PolarsSyntetosMetrics
-from ml_helper.infrastructure.shared.time_series_reader import (
-    TimeSeriesReadError,
-    load_time_series,
-)
+from ml_helper.infrastructure.shared.time_series_reader import TimeSeriesReadError
+from ml_helper.infrastructure.syntetos.pipeline import classify_source
 
 CELLS = list(notebook.app._cell_manager.cells())
 
@@ -33,9 +29,7 @@ def _pipeline(form_value):
     return _cell("error").run(
         mo=mo,
         form=Form(),
-        load_time_series=load_time_series,
-        classify_series=classify_series,
-        PolarsSyntetosMetrics=PolarsSyntetosMetrics,
+        classify_source=classify_source,
         TimeSeriesReadError=TimeSeriesReadError,
     )[1]
 
@@ -100,7 +94,7 @@ def test_valid_path_is_classified(tmp_path):
     path = tmp_path / "series.csv"
     path.write_text("date,value\n2026-01-01,10\n2026-01-02,0\n2026-01-03,12\n", encoding="utf-8")
     namespace, outputs = _outputs(_base(source=str(path)))
-    assert namespace["result"][1] is not None
+    assert namespace["result"].series_type is not None
     assert outputs is not None
 
 
