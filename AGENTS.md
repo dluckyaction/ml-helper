@@ -1,105 +1,85 @@
 # AGENTS.md
 
-Conventions for AI agents working in this repository.
+Operational checklist for AI agents working in this repository. The normative
+rules are in
+[`openspec/specs/architecture/spec.md`](openspec/specs/architecture/spec.md);
+when this file and the spec disagree, the spec wins and this file is fixed.
 
 ## Project
 
-ML Helper is a **generic** platform for machine learning experimentation and
-analysis: data processing, model experimentation, and analysis. It is not tied
-to any product domain.
+ML Helper is a portfolio of machine learning techniques, classical and
+generative. Each technique is documented as knowledge (core), computed
+efficiently (infrastructure), and optionally showcased (entrypoints).
 
-## Architecture
+## Layers
 
-Hexagonal (clean) architecture under `src/` with three layers:
+| Layer | Path | Owns | May import |
+| --- | --- | --- | --- |
+| core | `src/ml_helper/core/` | vocabulary, thresholds, ports, decisions, knowledge docstrings | standard library, `ml_helper.core` |
+| infrastructure | `src/ml_helper/infrastructure/` | all computation, I/O, pipelines | core, third-party |
+| entrypoints | `src/ml_helper/entrypoints/` | marimo notebooks, web delivery | core, infrastructure, third-party |
 
-| Layer | Owns | May import |
-| --- | --- | --- |
-| `src/core` | domain vocabulary, thresholds, ports, decisions | stdlib, Pydantic, PyArrow |
-| `src/infrastructure` | adapters: I/O, connectors, persistence, engines | core + third-party |
-| `src/entrypoints` | UI, API, CLI | core + infrastructure |
+## Where new code goes
 
-Dependencies point inward only: `entrypoints → infrastructure → core`.
-`core` never imports from the layers above it.
+- **A new technique or ML concept** → `core/<name>.py` with a knowledge
+  docstring (`## Overview`, `## Definitions`, `## Method`,
+  `## Assumptions and limitations`, `## References`, in that order) and a row
+  in the README technique catalog.
+- **Its computation** → `infrastructure/<name>/`, behind a port defined in
+  `core/<name>.py`. Vectorize; never loop over data in Python.
+- **Technique-agnostic code** (readers, inference, utilities) →
+  `infrastructure/shared/`. Code needed by two techniques moves here; a
+  technique package never imports another technique.
+- **A showcase** → `entrypoints/<name>/notebook.py` plus
+  `infrastructure/<name>/pipeline.py`. The notebook collects input, calls the
+  pipeline, and presents the result — no orchestration in the notebook.
+- **Web delivery** → static WebAssembly export of the notebook by default;
+  server-run only for secrets, GPU, or browser-unavailable dependencies, with
+  the reason stated in the technique's spec.
+- **A dependency used by one technique only** → optional dependency group
+  named after the technique.
 
-## Rule 1 — Pure core
+Use the same snake_case technique name in every layer.
 
-`src/core` SHALL NOT import **streamlit**, **gradio**, or **fastapi**, and
-SHALL stay free of third-party dependencies in practice. The AST-based guard
-in `tests/test_core_purity.py` enforces the framework ban.
+## Core never computes
 
-## Rule 2 — Calculations live in infrastructure
+Core functions take already-computed metrics (scalars or metric objects).
+No loops, comprehensions, `sum`/`min`/`max`/`len`/`sorted`/`map`/`filter`,
+or `statistics` in core; a core function may receive a collection only to pass
+it unchanged to a port. Scalar comparisons and formulas are fine.
 
-This is the rule agents break most often, so it is stated explicitly.
+## Vocabulary and language
 
-`src/core` contains **vocabulary, thresholds, ports, and decisions only**.
-Core modules SHALL NOT perform numeric computation — no `mean`, no `std`, no
-sums over per-period data, no division that aggregates a series.
+- `infrastructure/shared/` and generic wording are domain-neutral ("series",
+  "date column", "value column").
+- A technique uses its canonical vocabulary (e.g. "demand" for
+  Syntetos-Boylan) only inside its own core module, infrastructure package,
+  and entrypoint.
+- Name modules and capabilities after algorithms or ML concepts, never after a
+  product domain.
+- Everything — code, docstrings, UI strings, docs, OpenSpec — is in English.
 
-Why: Python loops over per-period values are far too slow for real
-workloads. Anything that scales is vectorized and therefore
-library-dependent, which makes it an infrastructure concern. Math placed in
-core has to be rewritten later to vectorize; math behind a port does not.
+## Guards
 
-The pattern to follow:
-
-```python
-# src/core/<domain>.py — decision only
-@dataclass(frozen=True)
-class SeriesMetrics:
-    ...
-
-class MetricsEngine(Protocol):
-    def compute(self, values) -> SeriesMetrics: ...
-
-def classify(metrics: SeriesMetrics) -> Type:
-    ...  # comparisons only
-
-# src/infrastructure/<domain>_metrics.py — computation
-class PolarsMetrics:
-    def compute(self, values) -> SeriesMetrics:
-        ...  # vectorized expressions
-```
-
-Entrypoints inject the concrete engine; core never learns which one it is.
-
-`tests/test_core_syntetos.py::test_core_module_performs_no_arithmetic`
-AST-parses `src/core/syntetos.py` and fails on any arithmetic node or metric
-helper call. Extend that guard when adding a new core module.
-
-## Rule 3 — Naming & semantics
-
-ML Helper is a generic ML tool, so **application vocabulary is
-domain-neutral**. Readers, adapters, and notebooks speak of "series", "date
-column", and "value column".
-
-Domain-specific terms — "demand", "SKU", "forecast", "backorder" — are
-permitted **only inside algorithm-inherent code**: the core module encoding
-that algorithm's vocabulary and the infrastructure module implementing its
-math. In this repo that is the Syntetos-Boylan classification, so
-`src/core/syntetos.py` and `src/infrastructure/syntetos_metrics.py` may say
-"demand" because the algorithm defines it.
-
-They SHALL NOT appear in `src/infrastructure/time_series_reader.py`, in
-`src/entrypoints/`, or in any user-visible string.
-
-Name capabilities, modules, and files after algorithms or generic ML
-concepts, never after a product domain.
+`tests/test_architecture.py` enforces the standard-library core, inward and
+isolated imports, no computation in core, knowledge docstrings, technique
+layout, and the README catalog. Do not weaken a guard to make a change pass;
+amend the spec in its own change instead.
 
 ## Testing
 
-- `uv run pytest` before marking any task complete.
-- Domain decisions are unit-tested with a **test double** for the engine port,
-  since core computes nothing and cannot be tested with real inputs alone.
-- Adapters are tested against hand-computed expected values. State the
-  hand computation in the test module docstring.
-- Notebooks stay thin views; assert they import rather than trying to test
-  their cells.
+- `uv run pytest` must pass before a task is marked complete.
+- Core decisions are tested with a test double for the engine port.
+- Infrastructure is tested against hand-computed values, stated in the test
+  module docstring.
+- Pipelines are tested directly, without a UI.
+- Notebook tests run cells against stubbed inputs; keep notebooks thin.
 
 ## OpenSpec workflow
 
-- Changes live under `openspec/changes/<name>/` with `proposal.md`,
+- Every change lives under `openspec/changes/<name>/` with `proposal.md`,
   `specs/**/spec.md`, `design.md`, and `tasks.md`.
+- One capability per technique, named after the algorithm or concept.
 - Every task ends with a commit.
-- All OpenSpec artifacts and repository documentation are written in
-  **English**.
-- Validate with `openspec validate --all` before considering planning done.
+- Validate with `openspec validate --all`; archive implemented changes so
+  `openspec/specs/` stays current.
