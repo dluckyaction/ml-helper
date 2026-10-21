@@ -215,3 +215,69 @@ def test_core_modules_carry_a_knowledge_docstring():
         + " in this order (architecture spec, 'Knowledge docstring'):\n"
         + "\n".join(offenders)
     )
+
+
+def _subpackages(directory: Path) -> list[str]:
+    return sorted(
+        child.name
+        for child in directory.iterdir()
+        if child.is_dir() and (child / "__init__.py").is_file()
+    )
+
+
+def _has_core_module(technique: str) -> bool:
+    core = PACKAGE_DIR / "core"
+    return (core / f"{technique}.py").is_file() or (
+        core / technique / "__init__.py"
+    ).is_file()
+
+
+def _defines_marimo_app(path: Path) -> bool:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in tree.body:
+        if (
+            isinstance(node, ast.Assign)
+            and any(isinstance(t, ast.Name) and t.id == "app" for t in node.targets)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Attribute)
+            and node.value.func.attr == "App"
+        ):
+            return True
+    return False
+
+
+def test_ml_helper_is_the_only_package_under_src():
+    packages = _subpackages(ROOT / "src")
+    assert packages == ["ml_helper"], (
+        "Only 'ml_helper' may live under src/ (architecture spec, 'Three-layer "
+        f"package'); found {packages}"
+    )
+
+
+def test_techniques_are_laid_out_consistently():
+    infrastructure = PACKAGE_DIR / "infrastructure"
+    entrypoints = PACKAGE_DIR / "entrypoints"
+    offenders = []
+
+    for technique in _subpackages(infrastructure):
+        if technique != SHARED and not _has_core_module(technique):
+            offenders.append(f"infrastructure/{technique}: no core module '{technique}'")
+
+    for technique in _subpackages(entrypoints):
+        if not _has_core_module(technique):
+            offenders.append(f"entrypoints/{technique}: no core module '{technique}'")
+        if not (infrastructure / technique / "pipeline.py").is_file():
+            offenders.append(
+                f"entrypoints/{technique}: no infrastructure/{technique}/pipeline.py"
+            )
+        notebook = entrypoints / technique / "notebook.py"
+        if not notebook.is_file():
+            offenders.append(f"entrypoints/{technique}: no notebook.py")
+        elif not _defines_marimo_app(notebook):
+            offenders.append(f"entrypoints/{technique}/notebook.py: defines no marimo app")
+
+    assert not offenders, (
+        "Techniques must use the same name in every layer; an entrypoint needs a "
+        "core module, a pipeline, and a marimo notebook (architecture spec, "
+        "'Technique layout across layers'):\n" + "\n".join(offenders)
+    )
