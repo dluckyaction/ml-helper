@@ -281,3 +281,37 @@ def test_techniques_are_laid_out_consistently():
         "core module, a pipeline, and a marimo notebook (architecture spec, "
         "'Technique layout across layers'):\n" + "\n".join(offenders)
     )
+
+
+CATALOG_HEADING = "## Technique catalog"
+
+
+def _catalog_core_modules() -> set[str] | None:
+    """Core module names in the README catalog table, or None without a catalog."""
+    lines = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
+    if CATALOG_HEADING not in lines:
+        return None
+    names = set()
+    for line in lines[lines.index(CATALOG_HEADING) + 1 :]:
+        if line.startswith("## "):
+            break
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if line.startswith("|") and len(cells) > 1 and cells[1].startswith("`"):
+            names.add(cells[1].strip("`"))
+    return names
+
+
+def _core_module_names() -> set[str]:
+    core = PACKAGE_DIR / "core"
+    modules = {path.stem for path in core.glob("*.py") if path.name != "__init__.py"}
+    return modules | set(_subpackages(core))
+
+
+def test_every_core_module_is_in_the_catalog():
+    listed = _catalog_core_modules()
+    assert listed is not None, f"README.md has no '{CATALOG_HEADING}' section"
+    missing = sorted(_core_module_names() - listed)
+    assert not missing, (
+        "Every core module needs a row in the README technique catalog "
+        "(architecture spec, 'Technique catalog'); missing: " + ", ".join(missing)
+    )
