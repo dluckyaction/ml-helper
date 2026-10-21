@@ -1,1 +1,1 @@
-"""Entrypoints layer: UI/API/CLI adapters."""
+"""Showcase layer: one package per technique with its marimo notebook."""

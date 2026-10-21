@@ -1,1 +1,1 @@
-"""Technique-agnostic infrastructure shared by every technique."""
+"""Technique-agnostic infrastructure: readers and utilities used by any technique."""

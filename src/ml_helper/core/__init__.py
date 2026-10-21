@@ -1,3 +1,5 @@
-"""Pure domain layer: models, metrics, and ports."""
+"""Knowledge layer: one documented module per technique or ML concept.
 
-__version__ = "0.1.0"
+Standard library only. Holds vocabulary, thresholds, ports, and decisions;
+never computation over data.
+"""
