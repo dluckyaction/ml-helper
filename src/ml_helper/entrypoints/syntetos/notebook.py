@@ -1,3 +1,8 @@
+"""Syntetos-Boylan notebook: load a series, chart it, and show its type.
+
+Presents ``ml_helper.core.syntetos`` through ``ml_helper.infrastructure.syntetos.pipeline``.
+"""
+
 import marimo
 
 __generated_with = "0.25.0"

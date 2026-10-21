@@ -1,9 +1,67 @@
-"""Syntetos-Boylan classification decision.
+"""Syntetos-Boylan demand classification.
 
-This module holds vocabulary, thresholds, the metrics-engine port, and the
-classification decision only. It performs no arithmetic: ADI and CV^2 are
-produced by a ``SeriesMetricsEngine`` supplied by the caller, so the
-aggregation can be vectorized and replaced without touching this module.
+## Overview
+
+The Syntetos-Boylan scheme sorts a time series into one of four demand
+patterns — smooth, erratic, intermittent, lumpy — from two summary metrics:
+how often demand occurs and how variable its size is when it does. The
+pattern tells which forecasting method is expected to perform best: smooth
+series suit classical methods such as exponential smoothing, while
+intermittent and lumpy series call for intermittent-demand methods such as
+Croston's method or its Syntetos-Boylan Approximation (SBA).
+
+This module holds the vocabulary, thresholds, metrics-engine port, and
+classification decision. The metrics are computed by a ``SeriesMetricsEngine``
+in infrastructure (``ml_helper.infrastructure.syntetos.metrics``).
+
+## Definitions
+
+- **Period**: one observation of the series; periods are assumed equally
+  spaced.
+- **Demand size**: the value of a period with nonzero demand.
+- **ADI** (average demand interval): the average number of periods between
+  two consecutive nonzero demands.
+- **CV²** (squared coefficient of variation): the variability of demand sizes
+  relative to their mean, squared.
+
+## Method
+
+Metrics, computed over a series of ``n`` periods with ``k`` nonzero periods:
+
+- ``ADI = n / k``
+- ``CV² = (std(sizes) / mean(sizes))²``, where ``sizes`` are the ``k`` nonzero
+  values and ``std`` is the sample standard deviation.
+
+Decision, with inclusive cut-offs ``ADI_HIGH = 1.32`` and ``CV2_HIGH = 0.49``:
+
+| | ``CV² < 0.49`` | ``CV² >= 0.49`` |
+| --- | --- | --- |
+| ``ADI < 1.32`` | smooth | erratic |
+| ``ADI >= 1.32`` | intermittent | lumpy |
+
+A series is labeled not classifiable when it has no demand at all
+(``k = 0``) or no zero-demand period (``ADI = 1.0``).
+
+## Assumptions and limitations
+
+- Every row is one period: gaps in the calendar must be filled with zeros
+  before classification, otherwise ADI is underestimated.
+- Values are expected to be non-negative quantities.
+- CV² needs at least two demand sizes to be defined.
+- The cut-offs come from comparing forecast errors of Croston, SBA, and
+  exponential smoothing under the authors' assumptions; they are guidance,
+  not hard boundaries.
+- Labeling series with ``ADI = 1.0`` as not classifiable is a convention of
+  this implementation, not part of the original scheme, which places them in
+  the smooth or erratic quadrants.
+
+## References
+
+- Syntetos, A. A., Boylan, J. E., & Croston, J. D. (2005). On the
+  categorization of demand patterns. *Journal of the Operational Research
+  Society*, 56(5), 495–503.
+- Croston, J. D. (1972). Forecasting and stock control for intermittent
+  demands. *Operational Research Quarterly*, 23(3), 289–303.
 """
 
 from dataclasses import dataclass

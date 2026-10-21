@@ -1,6 +1,7 @@
 """Vectorized Syntetos-Boylan metrics engine.
 
-Implements the core ``SeriesMetricsEngine`` port with polars expressions, so
+Implements the ``SeriesMetricsEngine`` port and the ADI and CV² formulas
+documented in ``ml_helper.core.syntetos``, using polars expressions, so
 per-period aggregation runs over a column instead of a Python loop and many
 series can be classified in a single grouped pass.
 """

@@ -13,7 +13,7 @@
 
 ## 3. Knowledge and catalog content
 
-- [ ] 3.1 Rewrite the `core/syntetos.py` module docstring as a knowledge entry with the five headings (Overview, Definitions, Method with ADI and CV² formulas and the quadrant rules, Assumptions and limitations, References to Syntetos, Boylan & Croston 2005), describing current behavior; reference it from the docstrings of `infrastructure/syntetos/metrics.py`, `pipeline.py`, and the notebook; verify `uv run pytest` passes; commit
+- [x] 3.1 Rewrite the `core/syntetos.py` module docstring as a knowledge entry with the five headings (Overview, Definitions, Method with ADI and CV² formulas and the quadrant rules, Assumptions and limitations, References to Syntetos, Boylan & Croston 2005), describing current behavior; reference it from the docstrings of `infrastructure/syntetos/metrics.py`, `pipeline.py`, and the notebook; verify `uv run pytest` passes; commit
 - [ ] 3.2 Give `core/__init__.py`, `infrastructure/__init__.py`, `infrastructure/shared/__init__.py`, and `entrypoints/__init__.py` package docstrings describing each layer's role in one or two sentences; verify `uv run pytest` passes; commit
 
 ## 4. Architecture guards
