@@ -32,4 +32,4 @@
 
 ## 6. Verification
 
-- [ ] 6.1 Run `uv run pytest`, `openspec validate --all`, and open the notebook with `uv run marimo run src/ml_helper/entrypoints/syntetos/notebook.py` to confirm it serves and classifies a sample CSV; commit any fixes
+- [x] 6.1 Run `uv run pytest`, `openspec validate --all`, and open the notebook with `uv run marimo run src/ml_helper/entrypoints/syntetos/notebook.py` to confirm it serves and classifies a sample CSV; commit any fixes
