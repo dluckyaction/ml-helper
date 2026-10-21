@@ -8,7 +8,7 @@
 
 ## 2. Syntetos pipeline
 
-- [ ] 2.1 Create `infrastructure/syntetos/pipeline.py` per design D3, with tests in `tests/test_syntetos_pipeline.py` covering a classified CSV path, an uploaded stream, a missing file, and an unknown column; verify the new tests pass; commit
+- [x] 2.1 Create `infrastructure/syntetos/pipeline.py` per design D3, with tests in `tests/test_syntetos_pipeline.py` covering a classified CSV path, an uploaded stream, a missing file, and an unknown column; verify the new tests pass; commit
 - [ ] 2.2 Make the notebook's pipeline cell call the pipeline instead of `load_time_series` and `classify_series` directly, keeping messages and outputs unchanged, and update `tests/test_notebook_import.py`; verify `uv run pytest` passes; commit
 
 ## 3. Knowledge and catalog content
