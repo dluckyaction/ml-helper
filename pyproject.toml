@@ -1,7 +1,7 @@
 [project]
 name = "ml-helper"
 version = "0.1.0"
-description = "Machine learning helper platform built on hexagonal architecture with a strict pure core"
+description = "A portfolio of machine learning techniques: documented knowledge, vectorized computation, and interactive notebooks"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
