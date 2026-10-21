@@ -137,3 +137,39 @@ def test_technique_infrastructure_is_isolated():
         "(architecture spec, 'Isolated technique infrastructure'):\n"
         + "\n".join(offenders)
     )
+
+
+_COMPUTATION_NODES = (
+    ast.For,
+    ast.AsyncFor,
+    ast.While,
+    ast.ListComp,
+    ast.SetComp,
+    ast.DictComp,
+    ast.GeneratorExp,
+)
+_AGGREGATING_CALLS = {"sum", "min", "max", "len", "sorted", "map", "filter"}
+_COMPUTATION_IMPORTS = {"statistics"}
+
+
+def test_core_performs_no_computation_over_collections():
+    offenders = []
+    for module in _modules(PACKAGE_DIR / "core"):
+        where = _relative(module.path)
+        for node in ast.walk(module.tree):
+            if isinstance(node, _COMPUTATION_NODES):
+                offenders.append(f"{where}:{node.lineno}: {type(node).__name__}")
+            elif (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id in _AGGREGATING_CALLS
+            ):
+                offenders.append(f"{where}:{node.lineno}: call to {node.func.id}()")
+        for name in _imports(module):
+            if name.split(".")[0] in _COMPUTATION_IMPORTS:
+                offenders.append(f"{where}: imports {name}")
+    assert not offenders, (
+        "Core holds knowledge, not computation; move it to infrastructure behind "
+        "a port (architecture spec, 'Core holds knowledge, not computation'):\n"
+        + "\n".join(offenders)
+    )

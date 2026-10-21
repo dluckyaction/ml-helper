@@ -19,7 +19,7 @@
 ## 4. Architecture guards
 
 - [x] 4.1 Create `tests/test_architecture.py` with the standard-library core and dependency-direction/lateral-import guards (design D4); verify they pass on the repository and fail when a temporary `import pandas` or a lateral import is introduced (check manually, then revert); commit
-- [ ] 4.2 Add the computation guard to `tests/test_architecture.py`, delete `tests/test_core_purity.py` and `test_core_module_performs_no_arithmetic`; verify it passes and fails on a temporary `for` loop in core (check manually, then revert); commit
+- [x] 4.2 Add the computation guard to `tests/test_architecture.py`, delete `tests/test_core_purity.py` and `test_core_module_performs_no_arithmetic`; verify it passes and fails on a temporary `for` loop in core (check manually, then revert); commit
 - [ ] 4.3 Add the knowledge-docstring guard; verify it passes and fails when a heading is removed from `core/syntetos.py` (check manually, then revert); commit
 - [ ] 4.4 Add the layout guard (matching core module, `pipeline.py`, `notebook.py`); verify it passes and fails when `entrypoints/syntetos/notebook.py` is temporarily renamed (check manually, then revert); commit
 

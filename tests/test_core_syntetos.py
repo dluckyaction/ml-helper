@@ -1,11 +1,8 @@
 """Decision tests for the core classification module.
 
-Core performs no arithmetic, so these tests drive it with a test double that
+Core computes no metrics, so these tests drive it with a test double that
 implements ``SeriesMetricsEngine`` and returns fixed metrics.
 """
-
-import ast
-from pathlib import Path
 
 import pytest
 from ml_helper.core.syntetos import (
@@ -103,36 +100,3 @@ def test_classify_series_maps_all_zero_series_to_not_classifiable():
 def test_quadrant_table(adi, cv2, expected):
     assert classify(adi=adi, cv2=cv2) is expected
 
-
-_ARITHMETIC_NODES = (
-    ast.Add,
-    ast.Sub,
-    ast.Mult,
-    ast.Div,
-    ast.FloorDiv,
-    ast.Mod,
-    ast.Pow,
-)
-
-_METRIC_HELPERS = ("avg_demand_interval", "squared_cv", "mean", "stdev", "std")
-
-
-def test_core_module_performs_no_arithmetic():
-    """Core owns the decision; every calculation belongs to an engine."""
-    path = Path(__file__).resolve().parents[1] / "src" / "ml_helper" / "core" / "syntetos.py"
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-
-    arithmetic = [
-        type(node).__name__
-        for node in ast.walk(tree)
-        if isinstance(node, _ARITHMETIC_NODES)
-    ]
-    assert not arithmetic, f"Arithmetic found in core: {arithmetic}"
-
-    called = {
-        node.func.id
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-    }
-    helpers = called & set(_METRIC_HELPERS)
-    assert not helpers, f"Metric calculations found in core: {sorted(helpers)}"
