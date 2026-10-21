@@ -173,3 +173,45 @@ def test_core_performs_no_computation_over_collections():
         "a port (architecture spec, 'Core holds knowledge, not computation'):\n"
         + "\n".join(offenders)
     )
+
+
+KNOWLEDGE_SECTIONS = [
+    "Overview",
+    "Definitions",
+    "Method",
+    "Assumptions and limitations",
+    "References",
+]
+
+
+def _knowledge_problem(docstring: str | None) -> str | None:
+    if not docstring:
+        return "no module docstring"
+    headings = [
+        line.strip()[3:].strip()
+        for line in docstring.splitlines()
+        if line.strip().startswith("## ")
+    ]
+    missing = [section for section in KNOWLEDGE_SECTIONS if section not in headings]
+    if missing:
+        return "missing " + ", ".join(f"'## {section}'" for section in missing)
+    found = [heading for heading in headings if heading in KNOWLEDGE_SECTIONS]
+    if found != KNOWLEDGE_SECTIONS:
+        return "sections out of order: " + ", ".join(found)
+    return None
+
+
+def test_core_modules_carry_a_knowledge_docstring():
+    offenders = []
+    for module in _modules(PACKAGE_DIR / "core"):
+        if module.is_package:
+            continue
+        problem = _knowledge_problem(ast.get_docstring(module.tree))
+        if problem:
+            offenders.append(f"{_relative(module.path)}: {problem}")
+    assert not offenders, (
+        "Core modules need a knowledge docstring with "
+        + ", ".join(f"'## {section}'" for section in KNOWLEDGE_SECTIONS)
+        + " in this order (architecture spec, 'Knowledge docstring'):\n"
+        + "\n".join(offenders)
+    )
