@@ -1,122 +1,96 @@
 # ML Helper
 
-A platform for machine learning experimentation and analysis, built on a
-hexagonal (clean) architecture with a strict pure core.
+A portfolio of machine learning techniques — classical and generative — each
+documented as knowledge, implemented as efficient computation, and showcased
+in an interactive notebook.
 
 ## Purpose
 
-ML Helper supports machine learning workflows — data processing, model
-experimentation, and analysis — while keeping the domain core free of any
-UI or framework coupling. Domain logic stays pure and testable; framework
-dependencies live behind interfaces in the infrastructure and entrypoint
-layers.
+Every technique in ML Helper answers three questions, one per layer:
+
+- **What is it and why does it work?** A documented core module: definitions,
+  formulas, decision rules, assumptions, and references. These docstrings are
+  the source of a future wiki.
+- **How is it computed efficiently?** Vectorized infrastructure behind the
+  ports the core module defines.
+- **How does it look in practice?** A marimo notebook for developers and,
+  when it makes sense, a web version that runs in the browser.
+
+Not every piece of knowledge needs all three: a concept can live in core
+alone, or in core and infrastructure without a showcase.
 
 ## Tech Stack
 
-- **Python 3.13+**
-- **uv** — package and environment management
-- **Pandas**, **Polars**, **PyArrow** — tabular data processing
-- **Pydantic** — data validation and models
-- **Pytest** — test runner
+- **Python 3.13+** and **uv** for environments and packaging
+- **pandas**, **polars**, **PyArrow** for tabular computation
+- **marimo** and **Altair** for notebooks and charts
+- **pytest** for tests, **OpenSpec** for change management
 
 ## Architecture
 
-Hexagonal architecture with three layers under `src/`:
+The normative rules live in
+[`openspec/specs/architecture/spec.md`](openspec/specs/architecture/spec.md).
+In short:
 
 ```
-                          ┌───────────────────────┐
-                          │      entrypoints      │  UI / API / CLI
-                          └───────────┬───────────┘
-                                      │
-                          ┌───────────▼───────────┐
-                          │    infrastructure     │  Adapters: I/O,
-                          │   (Pandas, Polars,    │  connectors,
-                          │   PyArrow adapters)   │  persistence
-                          └───────────┬───────────┘
-                                      │
-                          ┌───────────▼───────────┐
-                          │         core          │  Pure domain: models,
-                          │  (stdlib, Pydantic,   │  metrics, ports
-                          │   PyArrow only)       │  (Protocol)
-                          └───────────────────────┘
+entrypoints ──▶ infrastructure ──▶ core
+ showcase        computation        knowledge
+ (notebook,      (shared/ and one   (one documented module per
+  web export)     package per        technique or concept,
+                  technique)         standard library only)
 ```
 
-### Pure Core Rule
+- **core** holds vocabulary, thresholds, ports, and decisions. It imports only
+  the standard library and never computes over data. Every module opens with a
+  knowledge docstring: Overview, Definitions, Method, Assumptions and
+  limitations, References.
+- **infrastructure** does the computation. `shared/` is technique-agnostic
+  (readers, utilities); every other subpackage implements the core module of
+  the same name, exposes a `pipeline.py` when the technique is showcased, and
+  never imports another technique.
+- **entrypoints** showcase a technique: a marimo `notebook.py` that collects
+  input, calls the pipeline, and presents the result. Web delivery defaults to
+  a static WebAssembly export of that notebook.
 
-`src/core` must remain pure Python: it may only use the standard library,
-Pydantic, and PyArrow. It SHALL NOT import **Streamlit**, **Gradio**, or
-**FastAPI**. This rule is enforced automatically by the AST-based purity
-guard in `tests/test_core_purity.py`, which fails with the offending file
-name if the rule is broken.
+`tests/test_architecture.py` enforces these rules.
 
-### Calculations Live in Infrastructure
+## Technique catalog
 
-`src/core` holds vocabulary, thresholds, ports (`Protocol`), and domain
-decisions — and nothing else. Every numeric computation belongs to an
-infrastructure adapter behind a core-defined port.
-
-Python loops over per-period values are far too slow for real workloads, so
-the operations that must scale (counting nonzero periods, means, standard
-deviations) are implemented in `src/infrastructure` with vectorized
-expressions. Swapping or accelerating an engine never touches the domain
-decision.
-
-For example, `src/core/syntetos.py` defines `SeriesType`, the ADI/CV²
-thresholds, a `SeriesMetricsEngine` port, and `classify(adi, cv2)`. The
-engine itself is `PolarsSyntetosMetrics` in `src/infrastructure`, which
-satisfies the port and also classifies many series in one grouped pass.
-
-### Naming & Semantics
-
-ML Helper is a **generic** ML tool, so application vocabulary is
-domain-neutral. Readers, adapters, and notebooks speak of "series", "date
-column", and "value column" — never "demand", "SKU", or "forecast".
-
-Domain-specific terms are permitted only inside **algorithm-inherent code**,
-meaning the core module that encodes the algorithm's vocabulary and the
-infrastructure module that implements its math. In this repository that means
-the Syntetos-Boylan classification: `src/core/syntetos.py` and
-`src/infrastructure/syntetos_metrics.py` may say "demand" because the
-algorithm defines it, while `time_series_reader.py` and the notebook must
-not.
-
-Capabilities and files are named after algorithms or generic ML concepts,
-never after a product domain.
+| Technique | Core module | Infrastructure | Notebook | Web |
+| --- | --- | --- | --- | --- |
+| Syntetos-Boylan demand classification | `syntetos` | yes | yes | no |
 
 ## Repository Structure
 
 ```
 .
-├── openspec/                # OpenSpec workspace (changes, specs, config)
-├── src/
-│   ├── core/                # Pure domain: models, metrics, ports
-│   ├── infrastructure/      # Adapters: I/O, connectors, persistence
-│   └── entrypoints/         # UI/API/CLI entrypoints
-├── tests/                   # Pytest suite (smoke + purity guard)
-├── AGENTS.md                # Conventions for AI agents working in this repo
-├── pyproject.toml           # Packaging, dependencies, pytest config
-└── README.md
+├── openspec/                    # specs (normative) and changes
+├── src/ml_helper/
+│   ├── core/                    # knowledge: one module per technique/concept
+│   ├── infrastructure/
+│   │   ├── shared/              # technique-agnostic adapters
+│   │   └── <technique>/         # engines and pipeline for one technique
+│   └── entrypoints/
+│       └── <technique>/         # notebook.py (and web delivery)
+├── tests/
+├── AGENTS.md                    # checklist for AI agents
+└── pyproject.toml
 ```
 
 ## Quickstart
 
 ```bash
-uv sync                 # create the environment and install dependencies
-uv run pytest           # run the test suite
-```
+uv sync                  # create the environment and install dependencies
+uv run pytest            # run the test suite
 
-The project targets Python 3.13+; `uv` will manage the interpreter for you.
+# open a technique notebook (edit mode, or app mode with `run`)
+uv run marimo edit src/ml_helper/entrypoints/syntetos/notebook.py
+```
 
 ## OpenSpec Workflow
 
-This repository uses [OpenSpec](https://openspec.dev) for change management.
-
-- Changes live under `openspec/changes/<name>/` with `proposal.md`,
-  `specs/**/spec.md`, `design.md`, and `tasks.md`.
-- Every task must end with a commit.
-- Before marking a task complete, run `uv run pytest` to confirm the suite
-  passes.
-- Useful commands:
-  - `openspec list` — list active changes
-  - `openspec status --change "<name>"` — inspect a change
-  - `openspec doctor` — validate the workspace configuration
+Every change goes through [OpenSpec](https://openspec.dev): a change under
+`openspec/changes/<name>/` with `proposal.md`, `specs/**/spec.md`,
+`design.md`, and `tasks.md`; each task ends with a commit and a green
+`uv run pytest`. Validate with `openspec validate --all`, and archive the
+change once implemented so `openspec/specs/` stays the source of truth.

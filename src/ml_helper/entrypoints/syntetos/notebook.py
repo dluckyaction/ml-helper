@@ -1,3 +1,8 @@
+"""Syntetos-Boylan notebook: load a series, chart it, and show its type.
+
+Presents ``ml_helper.core.syntetos`` through ``ml_helper.infrastructure.syntetos.pipeline``.
+"""
+
 import marimo
 
 __generated_with = "0.25.0"
@@ -14,16 +19,10 @@ def _():
 
 @app.cell
 def _():
-    from core.syntetos import classify_series
-    from infrastructure.syntetos_metrics import PolarsSyntetosMetrics
-    from infrastructure.time_series_reader import TimeSeriesReadError, load_time_series
+    from ml_helper.infrastructure.shared.time_series_reader import TimeSeriesReadError
+    from ml_helper.infrastructure.syntetos.pipeline import classify_source
 
-    return (
-        PolarsSyntetosMetrics,
-        TimeSeriesReadError,
-        classify_series,
-        load_time_series,
-    )
+    return TimeSeriesReadError, classify_source
 
 
 @app.cell
@@ -59,14 +58,7 @@ def _(mo):
 
 
 @app.cell
-def _(
-    PolarsSyntetosMetrics,
-    TimeSeriesReadError,
-    classify_series,
-    form,
-    load_time_series,
-    mo,
-):
+def _(TimeSeriesReadError, classify_source, form, mo):
     import io
 
     form
@@ -92,12 +84,11 @@ def _(
         else:
             input_source = typed_source
         try:
-            _loaded = load_time_series(
+            result = classify_source(
                 input_source,
                 (form.value["date_column"] or "").strip(),
                 (form.value["value_column"] or "").strip(),
             )
-            result = (_loaded, classify_series(_loaded.values, PolarsSyntetosMetrics()))
         except TimeSeriesReadError as exc:
             error = str(exc)
 
@@ -110,7 +101,8 @@ def _(
 
 @app.cell
 def _(alt, mo, result):
-    _loaded, series_type = result
+    _loaded = result.series
+    series_type = result.series_type
 
     mo.ui.altair_chart(
         alt.Chart(

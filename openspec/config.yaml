@@ -3,37 +3,53 @@ schema: spec-driven
 # Project context
 # Shown to AI when creating artifacts.
 context: >-
-  Project: ML Helper.
+  Project: ML Helper, a portfolio of machine learning techniques, classical
+  and generative.
 
-  Purpose: platform for machine learning experimentation and analysis.
+  Tech stack: Python 3.13+, uv, pandas, polars, PyArrow, marimo, Altair,
+  pytest.
 
-  Tech stack: Python 3.13+, uv, Pandas, Polars, PyArrow, Pydantic, Pytest.
+  Architecture: the normative rules are in
+  openspec/specs/architecture/spec.md; read it before planning. Code lives in
+  src/ml_helper with three layers. core is the knowledge zone: one module per
+  technique or ML concept, standard library only, holding vocabulary,
+  thresholds, ports, and decisions, each opening with a knowledge docstring
+  (Overview, Definitions, Method, Assumptions and limitations, References);
+  core never computes over data. infrastructure holds all computation:
+  shared/ for technique-agnostic code and one package per technique (engines
+  plus pipeline.py), with no imports between techniques. entrypoints showcase
+  a technique with a marimo notebook.py that calls the pipeline; web delivery
+  defaults to a static WebAssembly export of the notebook. A technique may
+  exist in core only, in core and infrastructure, or in all three layers, and
+  uses the same snake_case name in each. tests/test_architecture.py enforces
+  these rules.
 
-  Domain: machine learning workflows, data processing, and model experimentation.
-
-  Architecture: hexagonal/clean architecture under src/ with three layers:
-  src/core (pure domain: models, metrics, ports/Protocol), src/infrastructure
-  (adapters: I/O, connectors, persistence), and src/entrypoints (UI/API/CLI).
-  Container-ready deployment, executable via CLI or service.
-
-  Rules:
-  - Strict pure core rule: src/core must not import streamlit, gradio, or fastapi.
-  - Calculations live in infrastructure, not core. Core owns vocabulary,
-    thresholds, ports (Protocol), and domain decisions only; every numeric
-    computation (counts, means, standard deviations) belongs to an
-    infrastructure adapter behind a core-defined port, so it can be vectorized
-    and replaced without touching core.
-  - Naming/semantics: ML Helper is a generic ML tool, so reader and notebook
-    vocabulary is domain-neutral ("series", "date column", "value column").
-    Domain-specific terms such as "demand" are confined to algorithm-inherent
-    code (the core decision module and the infrastructure metrics engine) and
-    must never appear in the reader, entrypoints, or user-visible wording.
-  - All OpenSpec artifacts and repository documentation are written in English.
+  Vocabulary: shared code and generic wording are domain-neutral; a technique
+  uses its canonical vocabulary only inside its own modules. Everything is
+  written in English.
 
 # Per-artifact rules
 rules:
+  proposal:
+    - Name the technique or ML concept affected and state which layers it
+      touches (core, infrastructure shared or technique package, entrypoints)
+      and why the untouched layers are not needed
+  specs:
+    - Use one capability per technique or ML concept, named after the
+      algorithm or concept, never after a product domain
+    - When a technique gains web delivery, state whether it is a WebAssembly
+      export or server-run and why
+  design:
+    - When a core module is added or changed, include the draft of its
+      knowledge docstring sections
+    - Place every computation over data in infrastructure behind a port
+      defined in core
   tasks:
     - End every task with a commit
+    - Include tasks for the knowledge docstring and the README technique
+      catalog row whenever a core module is added or changed
+    - Include tests for every task that changes behavior (test doubles for
+      core, hand-computed values for infrastructure, direct pipeline tests)
 
 # Per-operation guidance
 operations:
