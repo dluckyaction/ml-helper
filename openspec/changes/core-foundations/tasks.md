@@ -21,7 +21,7 @@ Every task ends with a commit that leaves `uv run pytest` green.
 
 ## 4. Final check
 
-- [ ] 4.1 Search `openspec/specs`, `openspec/changes/core-foundations`, `README.md`, `AGENTS.md`, `openspec/config.yaml`, `tests/`, and `src/` for "technique" (case-insensitive) and confirm each remaining occurrence means the kind, the Syntetos-Boylan technique, the project's description as a portfolio of ML techniques, or one of the six scenario titles kept by design; search the same places for "guard" and confirm each mention refers to one of the three kept guards. Run `uv run pytest` (56 tests), `openspec validate core-foundations --strict`, and `openspec validate --all`; all pass. Commit any fixes.
+- [x] 4.1 Search `openspec/specs`, `openspec/changes/core-foundations`, `README.md`, `AGENTS.md`, `openspec/config.yaml`, `tests/`, and `src/` for "technique" (case-insensitive) and confirm each remaining occurrence means the kind, the Syntetos-Boylan technique, the project's description as a portfolio of ML techniques, or one of the six scenario titles kept by design; search the same places for "guard" and confirm each mention refers to one of the three kept guards. Run `uv run pytest` (56 tests), `openspec validate core-foundations --strict`, and `openspec validate --all`; all pass. Commit any fixes.
 
 ## Workflow follow-up
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines how ML Helper, a portfolio of machine learning techniques, is organized: core as the documented knowledge base, infrastructure as the computation, and entrypoints as the showcase of each technique, with the rules that keep the three layers consistent as techniques are added.
+Defines how ML Helper, a portfolio of machine learning techniques, is organized: core as the documented knowledge base, infrastructure as the computation, and entrypoints as the showcase of each topic, with the rules that keep the three layers consistent as topics are added.
 
 ## Requirements
 
