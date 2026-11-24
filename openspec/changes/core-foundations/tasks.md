@@ -8,7 +8,7 @@ Every task ends with a commit that leaves `uv run pytest` green.
 
 ## 2. Guards and smoke test
 
-- [ ] 2.1 Remove the five convention guards from `tests/test_architecture.py` (`test_dependencies_point_inward`, `test_technique_infrastructure_is_isolated`, `test_core_performs_no_computation_over_collections`, `test_ml_helper_is_the_only_package_under_src`, `test_techniques_are_laid_out_consistently`) together with the helpers and constants only they used. Update the module docstring to say the file guards published knowledge and core portability, citing `project-baseline` "Executable Test Suite". Verify: the file defines exactly the standard-library core, knowledge docstring, and Knowledge catalog guards, and `uv run pytest` passes with 57 tests. Commit.
+- [x] 2.1 Remove the five convention guards from `tests/test_architecture.py` (`test_dependencies_point_inward`, `test_technique_infrastructure_is_isolated`, `test_core_performs_no_computation_over_collections`, `test_ml_helper_is_the_only_package_under_src`, `test_techniques_are_laid_out_consistently`) together with the helpers and constants only they used. Update the module docstring to say the file guards published knowledge and core portability, citing `project-baseline` "Executable Test Suite". Verify: the file defines exactly the standard-library core, knowledge docstring, and Knowledge catalog guards, and `uv run pytest` passes with 57 tests. Commit.
 - [ ] 2.2 Delete `tests/test_smoke.py`. Verify: `uv run pytest` passes with 56 tests. Commit.
 
 ## 3. Documentation and configuration
