@@ -6,7 +6,7 @@ in an interactive notebook.
 
 ## Purpose
 
-Every technique in ML Helper answers three questions, one per layer:
+Every topic in ML Helper answers three questions, one per layer:
 
 - **What is it and why does it work?** A documented core module: definitions,
   formulas, decision rules, assumptions, and references. These docstrings are
@@ -16,8 +16,8 @@ Every technique in ML Helper answers three questions, one per layer:
 - **How does it look in practice?** A marimo notebook for developers and,
   when it makes sense, a web version that runs in the browser.
 
-Not every piece of knowledge needs all three: a concept can live in core
-alone, or in core and infrastructure without a showcase.
+Not every topic needs all three: a topic can live in core alone, or in core
+and infrastructure without a showcase.
 
 ## Tech Stack
 
@@ -36,23 +36,44 @@ In short:
 entrypoints ──▶ infrastructure ──▶ core
  showcase        computation        knowledge
  (notebook,      (shared/ and one   (one documented module per
-  web export)     package per        technique or concept,
-                  technique)         standard library only)
+  web export)     package per        topic, standard library only)
+                  topic)
 ```
+
+The knowledge base is organized in **topics**, each documented by one core
+module and each of one **kind**:
+
+- **technique**: a method that computes or decides;
+- **concept**: an ML idea explained and possibly demonstrated;
+- **foundation**: non-ML groundwork that topics rely on, such as reading
+  tabular files.
+
+Two independent rules place a topic's code:
+
+- **Knowledge decides the core module.** Code with knowledge worth
+  documenting gets one.
+- **Reuse decides the infrastructure.** Code used by one topic lives in
+  `infrastructure/<topic>/`; code used by several topics lives in
+  `infrastructure/shared/`, with or without a core module.
+
+The layers:
 
 - **core** holds vocabulary, thresholds, ports, and decisions. It imports only
   the standard library and never computes over data. Every module opens with a
   knowledge docstring: Overview, Definitions, Method, Assumptions and
   limitations, References.
-- **infrastructure** does the computation. `shared/` is technique-agnostic
-  (readers, utilities); every other subpackage implements the core module of
-  the same name, exposes a `pipeline.py` when the technique is showcased, and
-  never imports another technique.
-- **entrypoints** showcase a technique: a marimo `notebook.py` that collects
+- **infrastructure** does the computation. Each `<topic>/` package implements
+  the core module of the same name, exposes a `pipeline.py` when the topic is
+  showcased, and never imports another topic; `shared/` holds code reused by
+  several topics.
+- **entrypoints** showcase a topic: a marimo `notebook.py` that collects
   input, calls the pipeline, and presents the result. Web delivery defaults to
   a static WebAssembly export of that notebook.
 
-`tests/test_architecture.py` enforces these rules.
+`tests/test_architecture.py` guards the published knowledge: core imports only
+the standard library, every core module carries a knowledge docstring, and
+every core module has a row in the Knowledge catalog. The other rules are
+enforced by review.
 
 ## Knowledge catalog
 
@@ -66,12 +87,12 @@ entrypoints ──▶ infrastructure ──▶ core
 .
 ├── openspec/                    # specs (normative) and changes
 ├── src/ml_helper/
-│   ├── core/                    # knowledge: one module per technique/concept
+│   ├── core/                    # knowledge: one module per topic
 │   ├── infrastructure/
-│   │   ├── shared/              # technique-agnostic adapters
-│   │   └── <technique>/         # engines and pipeline for one technique
+│   │   ├── shared/              # code reused by several topics
+│   │   └── <topic>/             # engines and pipeline for one topic
 │   └── entrypoints/
-│       └── <technique>/         # notebook.py (and web delivery)
+│       └── <topic>/             # notebook.py (and web delivery)
 ├── tests/
 ├── AGENTS.md                    # checklist for AI agents
 └── pyproject.toml
@@ -83,7 +104,7 @@ entrypoints ──▶ infrastructure ──▶ core
 uv sync                  # create the environment and install dependencies
 uv run pytest            # run the test suite
 
-# open a technique notebook (edit mode, or app mode with `run`)
+# open a topic notebook (edit mode, or app mode with `run`)
 uv run marimo edit src/ml_helper/entrypoints/syntetos/notebook.py
 ```
 
