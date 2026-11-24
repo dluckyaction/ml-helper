@@ -27,7 +27,8 @@ written.
 
 ## 1. `core-foundations`
 
-Amends the architecture spec only. No Syntetos or reader code moves.
+Amends the architecture and project-baseline specs. No Syntetos or reader
+code moves.
 
 ### Scope
 
@@ -59,18 +60,29 @@ Amends the architecture spec only. No Syntetos or reader code moves.
 - Keep the import rules at two levels: topic packages may import `shared/`;
   `shared/` imports only core and third-party libraries, never a topic;
   topics never import each other.
-- Update `tests/test_architecture.py`: the catalog guard reads the new table
-  and its `Kind` column, and the layout guard accepts a core module
-  implemented under `shared/`.
-- Update `AGENTS.md` and `openspec/config.yaml` with the new vocabulary and
-  the commit rule from the working agreement.
+- Add a **testing policy** to the `project-baseline` spec ("Test scope" and
+  "Test exclusions"): test what a topic teaches and what a user would notice
+  if it broke (formulas, decision rules at their edges, documented undefined
+  or rejected cases, one pipeline run per showcased topic); do not test
+  third-party libraries, constants, enum members, protocol conformance, UI
+  through framework internals, behavior already tested in another layer, or
+  conventions that review catches.
+- Reduce `tests/test_architecture.py` to three guards: standard-library core,
+  knowledge docstring, and Knowledge catalog (which finds the `Core module`
+  column by its header). The inward-dependency, isolated-infrastructure,
+  no-computation, single-package, and layout guards are removed; their rules
+  stay in the architecture spec, enforced by review. `tests/test_smoke.py` is
+  removed too.
+- Update `AGENTS.md` and `openspec/config.yaml` with the new vocabulary, the
+  testing policy, and the commit rule from the working agreement.
 
-Suggested tasks, each ending green:
+Tasks, each ending green:
 
-1. Amend the architecture spec; `openspec validate --all`.
-2. Rename the catalog, add the `Kind` column, and update the catalog guard.
-3. Update the layout and isolation guards for `shared/` implementations.
-4. Update `AGENTS.md` and `openspec/config.yaml`.
+1. Rename the catalog, add the `Kind` column, and update the catalog guard.
+2. Remove the five convention guards and the smoke test.
+3. Update `README.md`, `AGENTS.md`, `openspec/config.yaml`, the package
+   docstrings, and this roadmap.
+4. Search for stray "technique" wording; validate and archive.
 
 ### Decided
 
@@ -86,18 +98,22 @@ Suggested tasks, each ending green:
   (for example, Croston used by a forecaster comparison) and is still a
   technique.
 - The amendment is its own change, separate from any code change.
+- **The kind is documentation, not a guarded value.** The catalog guard
+  checks only that every core module has a row; no test reads the `Kind`
+  column.
+- **`entrypoints/shared/` is deferred.** Reusable notebook UI (the path / URL
+  / upload picker, the error callout) gets the folder when a second notebook
+  needs it; the spec does not mention it until then.
+- **A concept may live in core only**, like a foundation; a notebook is
+  optional for every kind.
+- Tests follow the testing policy, and only three architecture guards
+  remain; the other rules are enforced by review.
+- A testing clause for nondeterministic (generative) topics is written with
+  the first such topic.
 
 ### Open
 
-- **How the guard reads the kind.** Parse the `Kind` column of the catalog
-  row, and decide whether the guard checks it against a fixed list of the
-  three kinds.
-- **`entrypoints/shared/`.** Reusable notebook UI (the path / URL / upload
-  picker, the error callout) belongs in entrypoints, not infrastructure. Add
-  the folder and its layout-guard exemption now, or when a second notebook
-  needs it.
-- **What a concept may contain.** Must a concept have a notebook to be worth
-  a topic, or can it live in core only, like a foundation?
+None.
 
 ---
 
@@ -128,6 +144,9 @@ gets a core counterpart holding its knowledge.
 - Remove `LoadedSeries` and `time_series_reader.py`; move their tests.
 - Uploads are passed as bytes plus a file name, so the notebook no longer
   needs the `BytesIO` and `.name` workaround.
+- Tests follow the testing policy from `core-foundations`: the reader tests
+  moved from `time_series_reader.py` are trimmed to the behaviors the
+  knowledge docstrings state.
 
 ### Decided
 
@@ -192,7 +211,9 @@ the classification.
   becomes one short requirement. This also resolves the OpenSpec warning
   about an over-long requirement.
 - **Tests:** replace the notebook tests that use marimo's private
-  `_cell_manager` API.
+  `_cell_manager` API, and trim the Syntetos tests to the testing policy from
+  `core-foundations` (decision rules at the thresholds, undefined cases, one
+  pipeline run).
 
 ### Decided
 
