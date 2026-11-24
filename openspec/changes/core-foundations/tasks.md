@@ -4,7 +4,7 @@ Every task ends with a commit that leaves `uv run pytest` green.
 
 ## 1. Knowledge catalog
 
-- [ ] 1.1 In `README.md`, rename `## Technique catalog` to `## Knowledge catalog` and change the table header to `Topic | Kind | Core module | Infrastructure | Notebook | Web`, with `technique` as the kind of the Syntetos-Boylan row. In the same task, update the catalog guard in `tests/test_architecture.py`: new heading constant, the core module read from the column titled `Core module` instead of a fixed position, a failure when that column is missing, and messages naming the Knowledge catalog. Verify: `uv run pytest` passes, and deleting the Syntetos-Boylan row makes `test_every_core_module_is_in_the_catalog` fail and name `syntetos` (restore the row afterwards). Commit.
+- [x] 1.1 In `README.md`, rename `## Technique catalog` to `## Knowledge catalog` and change the table header to `Topic | Kind | Core module | Infrastructure | Notebook | Web`, with `technique` as the kind of the Syntetos-Boylan row. In the same task, update the catalog guard in `tests/test_architecture.py`: new heading constant, the core module read from the column titled `Core module` instead of a fixed position, a failure when that column is missing, and messages naming the Knowledge catalog. Verify: `uv run pytest` passes, and deleting the Syntetos-Boylan row makes `test_every_core_module_is_in_the_catalog` fail and name `syntetos` (restore the row afterwards). Commit.
 
 ## 2. Guards and smoke test
 

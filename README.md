@@ -54,11 +54,11 @@ entrypoints ──▶ infrastructure ──▶ core
 
 `tests/test_architecture.py` enforces these rules.
 
-## Technique catalog
+## Knowledge catalog
 
-| Technique | Core module | Infrastructure | Notebook | Web |
-| --- | --- | --- | --- | --- |
-| Syntetos-Boylan demand classification | `syntetos` | yes | yes | no |
+| Topic | Kind | Core module | Infrastructure | Notebook | Web |
+| --- | --- | --- | --- | --- | --- |
+| Syntetos-Boylan demand classification | technique | `syntetos` | yes | yes | no |
 
 ## Repository Structure
 

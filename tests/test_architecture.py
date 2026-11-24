@@ -283,22 +283,26 @@ def test_techniques_are_laid_out_consistently():
     )
 
 
-CATALOG_HEADING = "## Technique catalog"
+CATALOG_HEADING = "## Knowledge catalog"
+CORE_MODULE_COLUMN = "Core module"
 
 
-def _catalog_core_modules() -> set[str] | None:
-    """Core module names in the README catalog table, or None without a catalog."""
+def _cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _catalog_table() -> list[list[str]] | None:
+    """Cells of the README catalog table, header first, or None without a catalog."""
     lines = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
     if CATALOG_HEADING not in lines:
         return None
-    names = set()
+    table = []
     for line in lines[lines.index(CATALOG_HEADING) + 1 :]:
         if line.startswith("## "):
             break
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if line.startswith("|") and len(cells) > 1 and cells[1].startswith("`"):
-            names.add(cells[1].strip("`"))
-    return names
+        if line.startswith("|"):
+            table.append(_cells(line))
+    return table
 
 
 def _core_module_names() -> set[str]:
@@ -308,10 +312,17 @@ def _core_module_names() -> set[str]:
 
 
 def test_every_core_module_is_in_the_catalog():
-    listed = _catalog_core_modules()
-    assert listed is not None, f"README.md has no '{CATALOG_HEADING}' section"
+    table = _catalog_table()
+    assert table is not None, f"README.md has no '{CATALOG_HEADING}' section"
+    header = table[0] if table else []
+    assert CORE_MODULE_COLUMN in header, (
+        f"The README Knowledge catalog has no '{CORE_MODULE_COLUMN}' column "
+        "(architecture spec, 'Knowledge catalog')"
+    )
+    column = header.index(CORE_MODULE_COLUMN)
+    listed = {row[column].strip("`") for row in table[2:] if len(row) > column}
     missing = sorted(_core_module_names() - listed)
     assert not missing, (
-        "Every core module needs a row in the README technique catalog "
-        "(architecture spec, 'Technique catalog'); missing: " + ", ".join(missing)
+        "Every core module needs a row in the README Knowledge catalog "
+        "(architecture spec, 'Knowledge catalog'); missing: " + ", ".join(missing)
     )
