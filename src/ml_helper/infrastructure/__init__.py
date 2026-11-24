@@ -1,5 +1,5 @@
-"""Computation layer: vectorized engines, I/O, and per-technique pipelines.
+"""Computation layer: vectorized engines, I/O, and per-topic pipelines.
 
-``shared`` holds technique-agnostic adapters; every other subpackage
-implements the core module of the same name.
+``shared`` holds code reused by several topics, with or without a core module;
+every other subpackage implements the core module of the same name.
 """

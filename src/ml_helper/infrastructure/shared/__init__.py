@@ -1,1 +1,4 @@
-"""Technique-agnostic infrastructure: readers and utilities used by any technique."""
+"""Shared infrastructure: code reused by several topics.
+
+A shared module may implement a core module of the same name or have none.
+"""

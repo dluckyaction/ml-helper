@@ -1,1 +1,1 @@
-"""Showcase layer: one package per technique with its marimo notebook."""
+"""Showcase layer: one package per topic with its marimo notebook."""
