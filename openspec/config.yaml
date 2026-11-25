@@ -11,33 +11,51 @@ context: >-
 
   Architecture: the normative rules are in
   openspec/specs/architecture/spec.md; read it before planning. Code lives in
-  src/ml_helper with three layers. core is the knowledge zone: one module per
-  technique or ML concept, standard library only, holding vocabulary,
-  thresholds, ports, and decisions, each opening with a knowledge docstring
-  (Overview, Definitions, Method, Assumptions and limitations, References);
-  core never computes over data. infrastructure holds all computation:
-  shared/ for technique-agnostic code and one package per technique (engines
-  plus pipeline.py), with no imports between techniques. entrypoints showcase
-  a technique with a marimo notebook.py that calls the pipeline; web delivery
-  defaults to a static WebAssembly export of the notebook. A technique may
-  exist in core only, in core and infrastructure, or in all three layers, and
-  uses the same snake_case name in each. tests/test_architecture.py enforces
-  these rules.
+  src/ml_helper with three layers. The knowledge base is organized in topics,
+  each documented by one core module and each of one kind: technique (a
+  method that computes or decides), concept (an ML idea explained and
+  possibly demonstrated), or foundation (non-ML groundwork that topics rely
+  on). The kind is recorded in the README Knowledge catalog, never inferred
+  from where the code lives. core is the knowledge zone: one module per
+  topic, standard library only, holding vocabulary, thresholds, ports, and
+  decisions, each opening with a knowledge docstring (Overview, Definitions,
+  Method, Assumptions and limitations, References); core never computes over
+  data. infrastructure holds all computation. Two independent rules place
+  code: knowledge decides whether code gets a core module; reuse decides
+  whether its infrastructure lives in infrastructure/<topic>/ (one topic) or
+  infrastructure/shared/ (several topics, with or without a core module).
+  Topic packages hold engines plus pipeline.py and never import another
+  topic. entrypoints showcase a topic with a marimo notebook.py that calls
+  the pipeline; web delivery defaults to a static WebAssembly export of the
+  notebook. A topic may exist in core only, in core and infrastructure, or in
+  all three layers, and uses the same snake_case name in each.
 
-  Vocabulary: shared code and generic wording are domain-neutral; a technique
+  Testing policy: test what a topic teaches and what a user would notice if
+  it broke: formulas against hand-computed values, each decision rule in the
+  knowledge docstring's Method on both sides of the point where its outcome
+  changes, each undefined or rejected case named in Assumptions and
+  limitations, and one end-to-end pipeline run per showcased topic. Do not
+  test third-party libraries, constants, enum members, protocol conformance,
+  UI through framework internals, behavior already tested in another layer,
+  or conventions that review catches. tests/test_architecture.py keeps three
+  guards (standard-library core, knowledge docstring, Knowledge catalog); the
+  other architecture rules are enforced by review.
+
+  Vocabulary: shared code and generic wording are domain-neutral; a topic
   uses its canonical vocabulary only inside its own modules. Everything is
   written in English.
 
 # Per-artifact rules
 rules:
   proposal:
-    - Name the technique or ML concept affected and state which layers it
-      touches (core, infrastructure shared or technique package, entrypoints)
-      and why the untouched layers are not needed
+    - Name the topic affected and its kind (technique, concept, or
+      foundation), and state which layers it touches (core, infrastructure
+      shared or topic package, entrypoints) and why the untouched layers are
+      not needed
   specs:
-    - Use one capability per technique or ML concept, named after the
-      algorithm or concept, never after a product domain
-    - When a technique gains web delivery, state whether it is a WebAssembly
+    - Use one capability per topic, named after the algorithm, concept, or
+      foundation, never after a product domain
+    - When a topic gains web delivery, state whether it is a WebAssembly
       export or server-run and why
   design:
     - When a core module is added or changed, include the draft of its
@@ -45,11 +63,11 @@ rules:
     - Place every computation over data in infrastructure behind a port
       defined in core
   tasks:
-    - End every task with a commit
-    - Include tasks for the knowledge docstring and the README technique
+    - End every task with a commit that leaves `uv run pytest` green
+    - Include tasks for the knowledge docstring and the README Knowledge
       catalog row whenever a core module is added or changed
-    - Include tests for every task that changes behavior (test doubles for
-      core, hand-computed values for infrastructure, direct pipeline tests)
+    - Add a test only for a behavior the testing policy covers, and name the
+      spec scenario or docstring limitation it protects
 
 # Per-operation guidance
 operations:
